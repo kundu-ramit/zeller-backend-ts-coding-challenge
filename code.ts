@@ -34,8 +34,8 @@ interface Item {
   
     total(): number {
       let total = this.items.reduce((sum, item) => sum + item.price, 0); // Sum of all item prices
-      this.pricingRules.forEach(rule => (total = rule.apply(this.items))); // Apply each pricing rule
-      return total;
+      this.pricingRules.forEach(rule => (total = total - rule.apply(this.items))); // Apply each pricing rule
+      return Math.max(0,total); // total cannot be negative
     }
   }
   
@@ -47,7 +47,7 @@ interface Item {
       const appleTVs = cartItems.filter((item) => item.sku === "atv").length;
       const discount = Math.floor(appleTVs / 3); // Every 3rd Apple TV is free
       const totalDiscount = discount * cartItems.find((item) => item.sku === "atv")!.price;
-      return Math.max(0, cartItems.reduce((sum, item) => sum + item.price, 0) - totalDiscount); // Apply discount
+      return totalDiscount;
     }
   };
   
@@ -56,7 +56,7 @@ interface Item {
     apply: (cartItems) => {
       const ipads = cartItems.filter((item) => item.sku === "ipd").length;
       const discount = ipads > 4 ? ipads * (549.99 - 499.99) : 0; // Apply discount if more than 4 iPads
-      return Math.max(0, cartItems.reduce((sum, item) => sum + (item.sku === "ipd" ? 499.99 : item.price), 0) - discount);
+      return discount;
     }
   };
   
